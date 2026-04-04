@@ -1,26 +1,33 @@
 # quant_data_hub/core/config.py
 from pathlib import Path
 import os
-from typing import Any, Dict, Union
+from typing import Any, Dict
 
 import yaml
 
 
-def load_config(config_path: Union[str, Path, None] = None) -> Dict[str, Any]:
+def _resolve_config_path(config_path: str | Path | None) -> Path:
+    """Resolve config path to absolute Path object.
+
+    Production rationale: Guarantees a concrete Path before any filesystem operation,
+    satisfying strict type checkers while keeping default behaviour at package root.
+    """
+    if config_path is None:
+        # Structure: quant_data_hub/core/config.py  →  quant_data_hub/config.yaml
+        return Path(__file__).parent.parent / "config.yaml"
+
+    return Path(config_path)
+
+
+def load_config(config_path: str | Path | None = None) -> Dict[str, Any]:
     """Load config.yaml with environment-variable overrides for secrets.
 
     Production rationale: environment variables keep secrets out of Git
     while a single YAML file remains the source of truth for non-secret settings.
     """
-    if config_path is None:
-        # Resolve relative to the package root (one level above core/)
-        # Structure: quant_data_hub/core/config.py  →  quant_data_hub/config.yaml
-        config_path = Path(__file__).parent.parent / "config.yaml"
+    resolved_path = _resolve_config_path(config_path)
 
-    # Explicit conversion guarantees Path object; eliminates None for open() and Path()
-    config_path = Path(config_path)
-
-    with open(config_path, encoding="utf-8") as f:
+    with open(resolved_path, encoding="utf-8") as f:
         config: Dict[str, Any] = yaml.safe_load(f)
 
     # Override API keys from environment variables (standard in risk platforms)
