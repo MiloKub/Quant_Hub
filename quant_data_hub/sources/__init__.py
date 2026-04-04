@@ -1,9 +1,8 @@
 # quant_data_hub/sources/__init__.py
 """Data source implementations (one class per provider)."""
 
-# Will expose concrete fetchers once implemented
-# from .nyfed import NYFedFetcher
-# from .treasury import TreasuryFetcher
-# from .fred import FredFetcher
+# from .nyfed import NYFedFetcher       # commented - nyfed.py not yet created
+# from .treasury import TreasuryFetcher # commented
+# from .fred import FredFetcher         # commented
 
 __all__ = []
