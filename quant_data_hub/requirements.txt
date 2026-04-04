@@ -1,0 +1,2 @@
+pyyaml>=6.0
+# Will be extended later with: pandas, numpy, pyarrow, requests, tenacity, etc.
