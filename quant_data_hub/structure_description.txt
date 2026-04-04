@@ -1,0 +1,27 @@
+quant_data_hub/
+├── __init__.py
+├── config.yaml                  # API keys, series IDs, tickers, date ranges
+├── sources/                     # One file/class per data provider
+│   ├── fred.py
+│   ├── nyfed.py
+│   ├── treasury.py
+│   ├── ecb.py
+│   ├── yfinance.py
+│   └── chatham.py               # optional free-account swap data
+├── core/
+│   ├── fetcher.py               # Abstract base class + common logic
+│   ├── validator.py             # Data quality checks
+│   ├── cleaner.py
+│   └── storage.py               # Parquet + SQLite fallback
+├── pipelines/
+│   ├── rates_pipeline.py        # SOFR, EURIBOR, yield curves, swaps
+│   ├── equity_fx_pipeline.py
+│   └── curve_pipeline.py        # Bootstrapping-ready curves
+├── tests/
+│   ├── test_validation.py
+│   └── test_end_to_end.py
+├── utils/
+│   ├── logging.py
+│   └── retry.py                 # tenacity decorator
+├── data/                        # .parquet files (gitignored or in .gitignore + DVC)
+└── main.py or cli.py            # Daily refresh script
