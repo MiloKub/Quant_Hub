@@ -1,0 +1,31 @@
+# quant_data_hub/config.yaml
+
+data_sources:
+  sofr:
+    primary_source: "nyfed"          # key that maps to the class in sources/nyfed.py
+    fallback_source: "fred"
+    series_id_fred: "SOFR"           # only used by FRED fetcher
+    frequency: "daily"
+    start_date: "2018-04-02"         # SOFR publication start
+    storage_path: "data/rates/sofr"  # relative to project root; partitioned Parquet
+
+  treasury_yield_curve:
+    primary_source: "treasury"
+    tenors: ["1m", "3m", "6m", "1y", "2y", "3y", "5y", "7y", "10y", "20y", "30y"]
+    frequency: "daily"
+    start_date: "2000-01-01"
+    storage_path: "data/rates/treasury_yield"
+
+api:
+  fred_api_key: "your_key_here"      # will be overridden by env var in production
+  nyfed_base_url: "https://markets.newyorkfed.org/api"
+  treasury_base_url: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates"
+
+validation:
+  completeness_threshold: 0.99       # allow at most 1 % missing business days before warning
+  outlier_z_threshold: 5.0
+  negative_rate_tolerance: 0.001     # log but do not fail for rates very close to zero
+
+logging:
+  level: "INFO"
+  json_format: true

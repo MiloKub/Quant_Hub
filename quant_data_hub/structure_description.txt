@@ -24,4 +24,4 @@ quant_data_hub/
 │   ├── logging.py
 │   └── retry.py                 # tenacity decorator
 ├── data/                        # .parquet files (gitignored or in .gitignore + DVC)
-└── main.py or cli.py            # Daily refresh script
+└── main.py           # Daily refresh script
