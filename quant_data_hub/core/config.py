@@ -9,11 +9,12 @@ import yaml
 def _resolve_config_path(config_path: str | Path | None) -> Path:
     """Resolve config path to absolute Path object.
 
-    Production rationale: Guarantees a concrete Path before any filesystem operation,
-    satisfying strict type checkers while keeping default behaviour at package root.
+    Production rationale: Guarantees a concrete Path before any filesystem
+    operation, satisfying strict type checkers while keeping default
+    behaviour at package root.
     """
     if config_path is None:
-        # Structure: quant_data_hub/core/config.py  →  quant_data_hub/config.yaml
+        # Structure: quant_data_hub/core/config.py → quant_data_hub/config.yaml
         return Path(__file__).parent.parent / "config.yaml"
 
     return Path(config_path)
@@ -22,7 +23,7 @@ def _resolve_config_path(config_path: str | Path | None) -> Path:
 def load_config(config_path: str | Path | None = None) -> Dict[str, Any]:
     """Load config.yaml with environment-variable overrides for secrets.
 
-    Production rationale: environment variables keep secrets out of Git
+    Production rationale: Environment variables keep secrets out of Git
     while a single YAML file remains the source of truth for non-secret settings.
     """
     resolved_path = _resolve_config_path(config_path)
@@ -33,8 +34,9 @@ def load_config(config_path: str | Path | None = None) -> Dict[str, Any]:
     # Override API keys from environment variables (standard in risk platforms)
     if "api" in config and isinstance(config["api"], dict):
         config["api"]["fred_api_key"] = os.getenv(
-            "FRED_API_KEY", config["api"].get("fred_api_key")
+            "FRED_API_KEY", config["api"].get("fred_api_key", "")
         )
 
-    # Future extension point: add schema validation (e.g. with pydantic) if config grows
+    # Future extension: add pydantic BaseModel validation when config grows
+    # (ensures required keys and types for daily batch runs)
     return config

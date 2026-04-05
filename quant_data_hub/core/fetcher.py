@@ -20,18 +20,32 @@ class BaseFetcher(abc.ABC):
     """
 
     def __init__(self, source_config: Dict | None = None):
-        self.config = load_config() if source_config is None else {"data_sources": {source_config.get("name", ""): source_config}}
+        """Keep your original dict-style initialisation from sources."""
+        self.config = load_config() if source_config is None else {
+            "data_sources": {source_config.get("name", ""): source_config}
+        }
+
+        # === NEW LINES – this is what fixes the TypeError ===
+        # Extract series_key and series_config so downstream code (and future pipeline)
+        # can use self.series_key and self.series_config cleanly.
+        if isinstance(source_config, dict):
+            self.series_key = source_config.get("name", "sofr")
+            # Pull the real config from config.yaml (not the wrapped one)
+            self.series_config = load_config()["data_sources"].get(
+                self.series_key, source_config
+            )
+        else:
+            self.series_key = "sofr"
+            self.series_config = {}
+
         self.storage = Storage()
         self.validator = DataValidator()
 
-        # Anchor storage path to the package root (quant_data_hub/) so data/
-        # always lands inside the package regardless of current working directory.
+        # Anchor storage path to the package root (unchanged from your version)
         package_root = Path(__file__).parent.parent
-        source_name = list(self.config.get("data_sources", {}).keys())[0] if "data_sources" in self.config else "default"
-        relative_path = self.config.get("data_sources", {}) \
-                            .get(source_name, {}) \
-                            .get("storage_path", f"data/{source_name}")
-
+        relative_path = self.series_config.get(
+            "storage_path", f"data/rates/{self.series_key}"
+        )
         self.storage_path = package_root / relative_path
 
     @abc.abstractmethod
@@ -49,7 +63,6 @@ class BaseFetcher(abc.ABC):
         raw_df = self.fetch(start_date, end_date)
         cleaned_df = self._clean(raw_df)
         validated_df = self.validator.validate(cleaned_df)
-        # Instance call to save (matches the method definition above)
         self.storage.save(validated_df, self.storage_path)
         return validated_df
 

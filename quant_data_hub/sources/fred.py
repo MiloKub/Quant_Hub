@@ -23,29 +23,20 @@ class FredFetcher(BaseFetcher):
 
     @retry_on_failure
     def fetch(self, start_date: str, end_date: Optional[str] = None) -> pd.DataFrame:
-        """Fetch series from FRED API.
-
-        Production rationale: fredapi handles authentication, date parsing,
-        and returns a clean pandas Series that we convert to DataFrame.
-        """
-        # Prefer environment variable (standard for fredapi and risk platforms)
+        """Fetch series from FRED API."""
         api_key = os.getenv("FRED_API_KEY")
-
-        # Fallback to config.yaml if env var is not set
-        if not api_key or api_key == "your_actual_key":
-            config = self.config
-            api_key = config.get("api", {}).get("fred_api_key")
+        if not api_key or api_key in ("your_key_here", "your_actual_key"):
+            api_key = self.config.get("api", {}).get("fred_api_key")
 
         if not api_key or api_key in ("your_key_here", "your_actual_key"):
             raise ValueError(
                 "FRED_API_KEY not found. Set it as environment variable FRED_API_KEY "
-                "or in config.yaml under api: fred_api_key. "
-                "Get a free key at https://fred.stlouisfed.org/docs/api/api_key.html"
+                "or in config.yaml under api: fred_api_key."
             )
 
         fred = Fred(api_key=api_key)
 
-        series_id = self.config.get("data_sources", {}).get("sofr", {}).get("series_id_fred", "SOFR")
+        series_id = self.series_config.get("series_id_fred", "SOFR")  # <-- uses the new series_config
 
         series = fred.get_series(
             series_id=series_id,
@@ -56,5 +47,5 @@ class FredFetcher(BaseFetcher):
         if series.empty:
             return pd.DataFrame()
 
-        df = series.to_frame(name="SOFR")
+        df = series.to_frame(name=self.series_key.upper())  # keep column name consistent with series_key
         return df
