@@ -20,20 +20,17 @@ class BaseFetcher(abc.ABC):
     """
 
     def __init__(self, source_config: Dict | None = None):
-        self.config = load_config() if source_config is None else {
-            "data_sources": {source_config.get("name", ""): source_config}}
+        self.config = load_config() if source_config is None else {"data_sources": {source_config.get("name", ""): source_config}}
         self.storage = Storage()
         self.validator = DataValidator()
 
         # Anchor storage path to the package root (quant_data_hub/) so data/
         # always lands inside the package regardless of current working directory.
-        # This fixes the files appearing in the parent directory.
         package_root = Path(__file__).parent.parent
-        source_name = list(self.config.get("data_sources", {}).keys())[
-            0] if "data_sources" in self.config else "default"
+        source_name = list(self.config.get("data_sources", {}).keys())[0] if "data_sources" in self.config else "default"
         relative_path = self.config.get("data_sources", {}) \
-            .get(source_name, {}) \
-            .get("storage_path", f"data/{source_name}")
+                            .get(source_name, {}) \
+                            .get("storage_path", f"data/{source_name}")
 
         self.storage_path = package_root / relative_path
 
@@ -52,7 +49,8 @@ class BaseFetcher(abc.ABC):
         raw_df = self.fetch(start_date, end_date)
         cleaned_df = self._clean(raw_df)
         validated_df = self.validator.validate(cleaned_df)
-        self.storage.save(validated_df, self.storage_path)
+        # Use static call to Storage.save to avoid "unfilled parameter" warnings
+        Storage.save(validated_df, self.storage_path)
         return validated_df
 
     def _clean(self, df: pd.DataFrame) -> pd.DataFrame:

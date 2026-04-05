@@ -11,7 +11,7 @@ class Storage:
     Production rationale: Year partitioning + zstd compression balances query speed
     and storage size for daily batch runs with multi-year histories.
     """
-
+    @staticmethod
     def save(self, df: pd.DataFrame, base_path: Path) -> None:
         """Save DataFrame partitioned by year using pyarrow engine.
 

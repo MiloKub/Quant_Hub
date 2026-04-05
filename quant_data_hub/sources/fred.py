@@ -8,6 +8,7 @@ from typing import Optional
 from fredapi import Fred
 
 from ..core.fetcher import BaseFetcher
+from ..utils.retry import retry_on_failure
 
 
 class FredFetcher(BaseFetcher):
@@ -20,6 +21,7 @@ class FredFetcher(BaseFetcher):
     def __init__(self):
         super().__init__({"name": "sofr", "storage_path": "data/rates/sofr"})
 
+    @retry_on_failure
     def fetch(self, start_date: str, end_date: Optional[str] = None) -> pd.DataFrame:
         """Fetch series from FRED API.
 
