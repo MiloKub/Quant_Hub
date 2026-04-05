@@ -49,8 +49,8 @@ class BaseFetcher(abc.ABC):
         raw_df = self.fetch(start_date, end_date)
         cleaned_df = self._clean(raw_df)
         validated_df = self.validator.validate(cleaned_df)
-        # Use static call to Storage.save to avoid "unfilled parameter" warnings
-        Storage.save(validated_df, self.storage_path)
+        # Instance call to save (matches the method definition above)
+        self.storage.save(validated_df, self.storage_path)
         return validated_df
 
     def _clean(self, df: pd.DataFrame) -> pd.DataFrame:

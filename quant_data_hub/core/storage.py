@@ -11,13 +11,12 @@ class Storage:
     Production rationale: Year partitioning + zstd compression balances query speed
     and storage size for daily batch runs with multi-year histories.
     """
-    @staticmethod
+
     def save(self, df: pd.DataFrame, base_path: Path) -> None:
         """Save DataFrame partitioned by year using pyarrow engine.
 
         Production rationale: Skip empty DataFrames to prevent zero-byte files;
-        explicit engine and compression for consistency. No 'mode' parameter
-        (pyarrow does not support it).
+        explicit engine and compression for consistency.
         """
         if df.empty or len(df) == 0:
             return
@@ -38,7 +37,7 @@ class Storage:
         """Load from Parquet files and filter by date range.
 
         Production rationale: Filter out zero-byte or invalid files to prevent
-        pyarrow ArrowInvalid errors. Use explicit engine for consistency.
+        pyarrow ArrowInvalid errors.
         """
         if not base_path.exists():
             return None
@@ -47,7 +46,6 @@ class Storage:
         if not files:
             return None
 
-        # Skip zero-byte files (common during early debugging)
         valid_files = [f for f in files if f.stat().st_size > 0]
         if not valid_files:
             return None
@@ -57,7 +55,7 @@ class Storage:
             try:
                 df_part = pd.read_parquet(f, engine="pyarrow")
                 dfs.append(df_part)
-            except Exception:  # Production: replace with specific exception + structured log later
+            except Exception:  # Production: replace with specific exception later
                 continue
 
         if not dfs:
