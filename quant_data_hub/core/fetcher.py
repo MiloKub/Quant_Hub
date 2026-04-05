@@ -21,17 +21,12 @@ class BaseFetcher(abc.ABC):
 
     def __init__(self, source_config: Dict | None = None):
         """Keep your original dict-style initialisation from sources."""
-        self.config = load_config() if source_config is None else {
-            "data_sources": {source_config.get("name", ""): source_config}
-        }
+        self.config = load_config()  # always use the real config.yaml
 
-        # === NEW LINES – this is what fixes the TypeError ===
-        # Extract series_key and series_config so downstream code (and future pipeline)
-        # can use self.series_key and self.series_config cleanly.
+        # Extract series_key and series_config from the dict passed by FredFetcher / NYFedFetcher
         if isinstance(source_config, dict):
             self.series_key = source_config.get("name", "sofr")
-            # Pull the real config from config.yaml (not the wrapped one)
-            self.series_config = load_config()["data_sources"].get(
+            self.series_config = self.config["data_sources"].get(
                 self.series_key, source_config
             )
         else:
