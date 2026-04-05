@@ -20,15 +20,22 @@ class BaseFetcher(abc.ABC):
     """
 
     def __init__(self, source_config: Dict | None = None):
-        self.config = load_config() if source_config is None else {"data_sources": {source_config.get("name", ""): source_config}}
+        self.config = load_config() if source_config is None else {
+            "data_sources": {source_config.get("name", ""): source_config}}
         self.storage = Storage()
         self.validator = DataValidator()
 
-        # Resolve storage path for this source
-        source_name = list(self.config.get("data_sources", {}).keys())[0] if "data_sources" in self.config else "default"
-        self.storage_path = Path(self.config.get("data_sources", {})
-                                 .get(source_name, {})
-                                 .get("storage_path", f"data/{source_name}"))
+        # Anchor storage path to the package root (quant_data_hub/) so data/
+        # always lands inside the package regardless of current working directory.
+        # This fixes the files appearing in the parent directory.
+        package_root = Path(__file__).parent.parent
+        source_name = list(self.config.get("data_sources", {}).keys())[
+            0] if "data_sources" in self.config else "default"
+        relative_path = self.config.get("data_sources", {}) \
+            .get(source_name, {}) \
+            .get("storage_path", f"data/{source_name}")
+
+        self.storage_path = package_root / relative_path
 
     @abc.abstractmethod
     def fetch(self, start_date: str, end_date: Optional[str] = None) -> pd.DataFrame:

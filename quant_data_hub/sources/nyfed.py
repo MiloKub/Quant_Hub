@@ -25,31 +25,34 @@ class NYFedFetcher(BaseFetcher):
 
         Production rationale: Uses official public endpoint; response parsed to date-indexed DataFrame.
         """
-        base_url = "https://markets.newyorkfed.org/api"
-        end_date_str = end_date or pd.Timestamp.today().strftime("%Y-%m-%d")
+        # base_url = "https://markets.newyorkfed.org/api"
+        # end_date_str = end_date or pd.Timestamp.today().strftime("%Y-%m-%d")
+        #
+        # url = f"{base_url}/reference-rates/sofr/search.json"
+        # params = {
+        #     "startDate": start_date,
+        #     "endDate": end_date_str,
+        #     "format": "json"
+        # }
+        #
+        # resp = requests.get(url, params=params)
+        # resp.raise_for_status()
+        # data = resp.json()
+        #
+        # # Actual NY Fed response structure: top-level key often contains list of records
+        # # Common keys: effectiveDate, rate (or similar)
+        # records = data.get("refRates") or data.get("rates") or []
+        # if not records:
+        #     return pd.DataFrame()
+        #
+        # df = pd.DataFrame(records)
+        # if "effectiveDate" in df.columns and "rate" in df.columns:
+        #     df = df.set_index("effectiveDate")["rate"].to_frame(name="SOFR")
+        # else:
+        #     # Fallback parsing if column names differ slightly
+        #     df = pd.DataFrame()
+        #
+        # return df
 
-        url = f"{base_url}/reference-rates/sofr/search.json"
-        params = {
-            "startDate": start_date,
-            "endDate": end_date_str,
-            "format": "json"
-        }
-
-        resp = requests.get(url, params=params)
-        resp.raise_for_status()
-        data = resp.json()
-
-        # Actual NY Fed response structure: top-level key often contains list of records
-        # Common keys: effectiveDate, rate (or similar)
-        records = data.get("refRates") or data.get("rates") or []
-        if not records:
-            return pd.DataFrame()
-
-        df = pd.DataFrame(records)
-        if "effectiveDate" in df.columns and "rate" in df.columns:
-            df = df.set_index("effectiveDate")["rate"].to_frame(name="SOFR")
-        else:
-            # Fallback parsing if column names differ slightly
-            df = pd.DataFrame()
-
-        return df
+        # Disabled until full NY Fed integration
+        return pd.DataFrame()

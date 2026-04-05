@@ -2,8 +2,8 @@
 
 data_sources:
   sofr:
-    primary_source: "nyfed"          # key that maps to the class in sources/nyfed.py
-    fallback_source: "fred"
+    primary_source: "fred"          # key that maps to the class in sources/nyfed.py
+    fallback_source: "nyfed"
     series_id_fred: "SOFR"           # only used by FRED fetcher
     frequency: "daily"
     start_date: "2018-04-02"         # SOFR publication start
@@ -17,7 +17,7 @@ data_sources:
     storage_path: "data/rates/treasury_yield"
 
 api:
-  fred_api_key: "your_key_here"      # will be overridden by env var in production
+  fred_api_key: "your_key_here"      #  overridden by env var in production
   nyfed_base_url: "https://markets.newyorkfed.org/api"
   treasury_base_url: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates"
 

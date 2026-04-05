@@ -1,2 +1,7 @@
 pyyaml>=6.0
+fredapi>=0.5.0
+pyarrow>=15.0
+pandas
+requests
+numpy
 # Will be extended later with: pandas, numpy, pyarrow, requests, tenacity, etc.

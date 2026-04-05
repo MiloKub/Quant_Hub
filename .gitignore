@@ -1,5 +1,7 @@
 /quant_data_hub/data/
-/Grok
+/quant_data_hub/Private/Grok
 /Plan.txt
 /.venv
 /test_config_py.py
+/APIKeys_Private.txt
+/Private
