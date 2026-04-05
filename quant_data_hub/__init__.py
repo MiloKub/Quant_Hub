@@ -9,6 +9,6 @@ __version__ = "0.1.0"
 # Public API - expanded as modules are implemented
 from .core.config import load_config
 
-# from .pipelines.rates_pipeline import get_rates   # commented until pipeline exists
+from .pipelines import get_sofr   # commented until pipeline exists
 
-__all__ = ["load_config"]
+__all__ = ["load_config", "get_sofr"]
